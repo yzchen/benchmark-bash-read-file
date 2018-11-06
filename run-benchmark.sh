@@ -69,3 +69,15 @@ echo "--------------------------------------------------------------------------
 rm -f dummy-out.txt
 echo '9. exec 3<&0 0<$INFILE 4>&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3<&- 1>&4 4>&-'
 time ( exec 3<&0 0<$INFILE 4>&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3<&- 1>&4 4>&- )
+
+echo "------------------------------------------------------------------------------"
+echo ">>> in this case generated file has different order from original one <<<"
+rm -f dummy-out.txt
+echo -e '10. split --additional-suffix .tmp -l 2000 dummy.txt; find . -name "*.tmp" | parallel --no-notice "while read LINE; do echo $LINE >> {}.out; done < {}"; cat *.out > dummy-out.txt; rm *.tmp *.out'
+time ( split --additional-suffix .tmp -l 2000 dummy.txt; find . -name "*.tmp" | parallel -j10 --no-notice "while read LINE; do echo $LINE >> {}.out; done < {}"; cat *.out > dummy-out.txt; rm *.tmp *.out )
+
+echo "------------------------------------------------------------------------------"
+echo ">>> with awk actually it's not processing line by line any more <<<"
+rm -f dummy-out.txt
+echo "11. awk '{print}' dummy.txt > dummy-out.txt"
+time ( awk '{print}' dummy.txt > dummy-out.txt )
