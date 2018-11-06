@@ -4,13 +4,20 @@ echo "Initial Settings : "
 INFILE=dummy.txt
 OUTFILE=dummy-out.txt
 echo -e "\tINFILE : dummy.txt"
-echo -e "\tOUTFILE : dummy-out.txt\n"
+echo -e "\tOUTFILE : dummy-out.txt"
+echo ""
 
-echo "Information about INFILE : "
+echo "INFILE information : "
 echo -e "\t#rows =" `wc -l $INFILE | awk '{print $1}'`
 echo -e "\t#columns =" `head -1 $INFILE | wc -c` 
 echo -e "\tsize =" `ls -lh $INFILE | awk '{print $6}' `
+echo ""
 
+echo "System information : "
+echo "1. CPU "
+echo `lscpu | grep 'CPU(s)'`
+echo "2. Memory "
+echo "Memory: " `free -h | grep 'Mem' | awk '{print $2}'`
 echo ""
 
 # explicitly set time format for 'time' command
@@ -57,3 +64,8 @@ echo "--------------------------------------------------------------------------
 rm -f dummy-out.txt
 echo '8. exec 4>&1 1>$OUTFILE; for LINE in $(cat $INFILE); do echo "$LINE"; done; exec 1>&4 4>&-'
 time ( exec 4>&1 1>$OUTFILE; for LINE in $(cat $INFILE); do echo "$LINE"; done; exec 1>&4 4>&- )
+
+echo "------------------------------------------------------------------------------"
+rm -f dummy-out.txt
+echo '9. exec 3<&0 0<$INFILE 4>&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3<&- 1>&4 4>&-'
+time ( exec 3<&0 0<$INFILE 4>&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3<&- 1>&4 4>&- )

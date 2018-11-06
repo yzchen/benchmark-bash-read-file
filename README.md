@@ -21,3 +21,5 @@ things should notice in different methods :
 - loop : while v.s. **for**
 
 - pipe v.s. redirection v.s. **file descriptor**
+
+- read v.s **line**
