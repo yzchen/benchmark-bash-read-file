@@ -24,8 +24,8 @@ echo ""
 TIMEFMT=$'\nreal\t%E\nuser\t%U\nsys\t%S'
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
-echo '1. cat $INFILE | while read LINE; do echo \"$LINE\" >> $OUTFILE; done'
+>$OUTFILE
+echo '1. cat $INFILE | while read LINE; do echo "$LINE" >> $OUTFILE; done'
 time ( cat $INFILE | while read LINE; do echo "$LINE" >> $OUTFILE; done )
 if diff $INFILE $OUTFILE &> /dev/null; then
     echo "check : output file is the same as input file"
@@ -38,7 +38,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '2. while read LINE; do echo "$LINE" >> $OUTFILE; done < $INFILE'
 time ( while read LINE; do echo "$LINE" >> $OUTFILE; done < $INFILE )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -52,7 +52,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '3. cat $INFILE | while LINE=`line`; do echo "$LINE" >> $OUTFILE; done'
 echo ">>> your system should support 'line' command <<<"
 time ( cat $INFILE | while LINE=`line`; do echo "$LINE" >> $OUTFILE; done )
@@ -67,7 +67,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '4. while LINE=`line`; do echo "$LINE" >> $OUTFILE; done < $INFILE'
 echo ">>> your system should support 'line' command <<<"
 time ( while LINE=`line`; do echo "$LINE" >> $OUTFILE; done < $INFILE )
@@ -82,7 +82,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '5. exec 3<&0 0<$INFILE; while read LINE; do echo "$LINE" >> $OUTFILE; done; exec 0<&3 3>&-'
 time ( exec 3<&0 0<$INFILE; while read LINE; do echo "$LINE" >> $OUTFILE; done; exec 0<&3 3>&- )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -96,7 +96,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '6. exec 3<&0 0<$INFILE 4<&1 1>$OUTFILE; while read LINE; do echo "$LINE"; done; exec 0<&3 3>&- 1<&4 4>&-'
 time ( exec 3<&0 0<$INFILE 4<&1 1>$OUTFILE; while read LINE; do echo "$LINE"; done; exec 0<&3 3>&- 1<&4 4>&- )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -110,7 +110,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '7. for LINE in $(cat $INFILE); do echo "$LINE" >> $OUTFILE; done'
 time ( for LINE in $(cat $INFILE); do echo "$LINE" >> $OUTFILE; done )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -124,7 +124,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '8. exec 4<&1 1>$OUTFILE; for LINE in $(cat $INFILE); do echo "$LINE"; done; exec 1<&4 4>&-'
 time ( exec 4<&1 1>$OUTFILE; for LINE in $(cat $INFILE); do echo "$LINE"; done; exec 1<&4 4>&- )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -138,7 +138,7 @@ else
 fi
 
 echo "------------------------------------------------------------------------------"
-rm -f dummy-out.txt
+>$OUTFILE
 echo '9. exec 3<&0 0<$INFILE 4<&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3>&- 1<&4 4>&-'
 time ( exec 3<&0 0<$INFILE 4<&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3>&- 1<&4 4>&- )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -153,7 +153,7 @@ fi
 
 echo "------------------------------------------------------------------------------"
 echo ">>> in this case generated file has different order from original one <<<"
-rm -f dummy-out.txt
+>$OUTFILE
 echo -e '10. split --additional-suffix .tmp -l 2000 dummy.txt; find . -name "*.tmp" | parallel --no-notice "while read LINE; do echo $LINE >> {}.out; done < {}"; cat *.out > dummy-out.txt; rm *.tmp *.out'
 time ( split --additional-suffix .tmp -l 2000 dummy.txt; find . -name "*.tmp" | parallel -j10 --no-notice "while read LINE; do echo $LINE >> {}.out; done < {}"; cat *.out > dummy-out.txt; rm *.tmp *.out )
 if diff $INFILE $OUTFILE &> /dev/null; then
@@ -168,7 +168,7 @@ fi
 
 echo "------------------------------------------------------------------------------"
 echo ">>> with awk actually it's not processing line by line any more <<<"
-rm -f dummy-out.txt
+>$OUTFILE
 echo "11. awk '{print}' dummy.txt > dummy-out.txt"
 time ( awk '{print}' dummy.txt > dummy-out.txt )
 if diff $INFILE $OUTFILE &> /dev/null; then
