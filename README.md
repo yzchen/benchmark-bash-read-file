@@ -10,9 +10,9 @@ in this example, information of `dummy.txt` :
 
 - #rows = 40000
 
-- #columns = 41 (EOL:End of Line is counted)
+- #columns = 61 (EOL:End of Line is counted)
 
-- size =  1.6M
+- size =  2.4 MiB
 
 information of my current running system :
 

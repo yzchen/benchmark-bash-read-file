@@ -1,0 +1,96 @@
+Initial Settings : 
+	INFILE : dummy.txt
+	OUTFILE : dummy-out.txt
+
+INFILE information : 
+	#rows = 40000
+	#columns = 61
+	size = Nov
+
+System information : 
+1. CPU 
+CPU(s): 20 On-line CPU(s) list: 0-19 NUMA node0 CPU(s): 0-19
+2. Memory 
+Memory:  251G
+
+------------------------------------------------------------------------------
+1. cat $INFILE | while read LINE; do echo "$LINE" >> $OUTFILE; done
+
+real	0m1.512s
+user	0m0.880s
+sys	0m0.624s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+2. while read LINE; do echo "$LINE" >> $OUTFILE; done < $INFILE
+
+real	0m1.059s
+user	0m0.784s
+sys	0m0.272s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+3. cat $INFILE | while LINE=`line`; do echo "$LINE" >> $OUTFILE; done
+>>> your system should support 'line' command <<<
+
+real	0m0.141s
+user	0m0.000s
+sys	0m0.000s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+4. while LINE=`line`; do echo "$LINE" >> $OUTFILE; done < $INFILE
+>>> your system should support 'line' command <<<
+
+real	0m0.139s
+user	0m0.000s
+sys	0m0.000s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+5. exec 3<&0 0<$INFILE; while read LINE; do echo "$LINE" >> $OUTFILE; done; exec 0<&3 3>&-
+
+real	0m1.052s
+user	0m0.840s
+sys	0m0.208s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+6. exec 3<&0 0<$INFILE 4<&1 1>$OUTFILE; while read LINE; do echo "$LINE"; done; exec 0<&3 3>&- 1<&4 4>&-
+
+real	0m0.740s
+user	0m0.628s
+sys	0m0.108s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+7. for LINE in $(cat $INFILE); do echo "$LINE" >> $OUTFILE; done
+
+real	0m0.880s
+user	0m0.612s
+sys	0m0.268s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+8. exec 4<&1 1>$OUTFILE; for LINE in $(cat $INFILE); do echo "$LINE"; done; exec 1<&4 4>&-
+
+real	0m0.550s
+user	0m0.480s
+sys	0m0.072s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+9. exec 3<&0 0<$INFILE 4<&1 1>$OUTFILE; while LINE=`line`; do echo "$LINE"; done; exec 0<&3 3>&- 1<&4 4>&-
+
+real	0m0.141s
+user	0m0.000s
+sys	0m0.000s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+>>> in this case generated file has different order from original one <<<
+10. split --additional-suffix .tmp -l 2000 dummy.txt; find . -name "*.tmp" | parallel --no-notice "while read LINE; do echo $LINE >> {}.out; done < {}"; cat *.out > dummy-out.txt; rm *.tmp *.out
+
+real	0m0.272s
+user	0m0.804s
+sys	0m0.248s
+check : output file is the same as input file
+------------------------------------------------------------------------------
+>>> with awk actually it's not processing line by line any more <<<
+11. awk '{print}' dummy.txt > dummy-out.txt
+
+real	0m0.012s
+user	0m0.012s
+sys	0m0.000s
+check : output file is the same as input file

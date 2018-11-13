@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "generate 1,000,000 lines random file with each line has 60 characters"
+echo "generate 40,000 lines random file with each line has 60 characters"
 
 INFILE=dummy.txt
-NUMLINES=4000
+NUMLINES=40000
 NUMCHARS=60
 
 >$INFILE
